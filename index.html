@@ -38,23 +38,27 @@
 <body>
   <div class="container">
     <h2>Kirim Pesan ke Telegram Bot</h2>
+    <input type="text" id="name" placeholder="Nama Anda">
     <textarea id="message" rows="5" placeholder="Tulis pesan di sini..."></textarea>
     <button onclick="sendMessage()">Kirim</button>
     <p id="status"></p>
   </div>
 
   <script>
-    const BOT_TOKEN = '7784863108:AAFYgdlWwaGRsdTMvaTqc15Tp617jFaK3is'; // Ganti dengan token bot
-    const CHAT_ID = '-1002693052458';     // Ganti dengan chat ID tujuan
+    const BOT_TOKEN = '7784863108:AAFYgdlWwaGRsdTMvaTqc15Tp617jFaK3is';
+    const CHAT_ID = '-1002693052458';
 
     function sendMessage() {
-      const message = document.getElementById('message').value;
+      const name = document.getElementById('name').value.trim();
+      const message = document.getElementById('message').value.trim();
       const status = document.getElementById('status');
-      
-      if (!message) {
-        status.innerText = 'Pesan tidak boleh kosong.';
+
+      if (!name || !message) {
+        status.innerText = 'Nama dan pesan tidak boleh kosong.';
         return;
       }
+
+      const finalMessage = `Pesan dari ${name}:\n${message}`;
 
       fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
         method: 'POST',
@@ -63,13 +67,14 @@
         },
         body: JSON.stringify({
           chat_id: CHAT_ID,
-          text: message
+          text: finalMessage
         })
       })
       .then(response => response.json())
       .then(data => {
         if (data.ok) {
           status.innerText = 'Pesan berhasil dikirim!';
+          document.getElementById('message').value = '';
         } else {
           status.innerText = 'Gagal mengirim pesan.';
         }
