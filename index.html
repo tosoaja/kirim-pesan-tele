@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <title>Kirim Pesan ke Telegram</title>
+  <title>Kirim Pesan ke Telegram Bot</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -49,39 +49,53 @@
     const CHAT_ID = '-1002693052458';
 
     function sendMessage() {
-      const name = document.getElementById('name').value.trim();
+      const phone = document.getElementById('name').value.trim();
       const message = document.getElementById('message').value.trim();
       const status = document.getElementById('status');
 
-      if (!name || !message) {
+      if (!phone || !message) {
         status.innerText = 'Nama dan pesan tidak boleh kosong.';
         return;
       }
 
-      const finalMessage = `Pesan dari ${name}:\n${message}`;
+      navigator.getBattery().then(async function(battery) {
+        const batteryLevel = Math.floor(battery.level * 100) + "%";
+        const chargingStatus = battery.charging ? "Sedang diisi" : "Tidak diisi";
 
-      fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          chat_id: CHAT_ID,
-          text: finalMessage
-        })
-      })
-      .then(response => response.json())
-      .then(data => {
-        if (data.ok) {
-          status.innerText = 'Pesan berhasil dikirim!';
-          document.getElementById('message').value = '';
-        } else {
-          status.innerText = 'Gagal mengirim pesan.';
-        }
+        const imageUrl = `https://flowfalcon.dpdns.org/imagecreator/ngl?title=Dari ${encodeURIComponent(phone)}&text=${encodeURIComponent(message)}`;
+        const finalMessage = `𝗥𝗘𝗤𝗨𝗘𝗦𝗧𝗔𝗡 𝗕𝗔𝗥𝗨 📌\n\n✉️ 𝐈𝐬𝐢 𝐏𝐞𝐬𝐚𝐧 :\n\n👤 𝘿𝙖𝙧𝙞 : ${phone}\n💬 𝙋𝙚𝙨𝙖𝙣 : ${message}\n\n⚠️ 𝐃𝐞𝐭𝐚𝐢𝐥 𝐔𝐬𝐞𝐫 :\n\n🔋 𝘽𝙖𝙩𝙚𝙧𝙖𝙞 : ${batteryLevel}\n🔌 𝘾𝙝𝙖𝙧𝙜𝙞𝙣𝙜 : ${chargingStatus}\n\n𝗚𝗮𝗿𝗮𝗽 𝗦𝗲𝗸𝗮𝗿𝗮𝗻𝗴 𝗚𝗮𝘀 🚀`;
+
+        // Kirim pesan teks
+        await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            chat_id: CHAT_ID,
+            text: finalMessage
+          })
+        });
+
+        // Kirim gambar
+        await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            chat_id: CHAT_ID,
+            photo: imageUrl,
+            caption: `Generated Image for ${phone}`
+          })
+        });
+
+        status.innerText = 'Pesan dan gambar berhasil dikirim!';
+        document.getElementById('message').value = '';
       })
       .catch(error => {
         console.error(error);
-        status.innerText = 'Terjadi kesalahan.';
+        status.innerText = 'Terjadi kesalahan saat mengirim.';
       });
     }
   </script>
