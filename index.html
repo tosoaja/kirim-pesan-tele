@@ -1,0 +1,162 @@
+<!DOCTYPE html><html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To-CodeGood</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #6366F1, #3B82F6);
+            --secondary-gradient: linear-gradient(135deg, #10B981, #34D399);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: #;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        h1, h2 {
+            color: #1d1d1f;
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0 0 20px 0;
+        }
+
+        li {
+            margin-bottom: 15px;
+            background-color: white;
+            padding: 15px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        li b {
+            display: block;
+            color: #1d1d1f;
+            margin-bottom: 8px;
+            font-size: 16px;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #d2d2d7;
+            border-radius: 8px;
+            font-size: 14px;
+            margin-top: 5px;
+            box-sizing: border-box;
+        }
+
+        hr {
+            border: 0;
+            height: 1px;
+            background-color: #e0e0e0;
+            margin: 25px 0;
+        }
+
+        button {
+            background-color: #0071e3;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 20px;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+            transition: background-color 0.2s;
+        }
+
+        button:hover {
+            background-color: #0077ed;
+        }
+
+        input::placeholder,
+        textarea::placeholder {
+            color: #86868b;
+            opacity: 1;
+        }
+
+        .cyberpunk-border {
+            border: 2px solid transparent;
+            border-image: linear-gradient(135deg, #6366F1, #3B82F6, #10B981) 1;
+            padding: 20px;
+            border-radius: 15px;
+        }
+
+        .btn {
+            transition: all 0.3s ease-in-out;
+            box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3);
+        }
+
+        .btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 14px rgba(16, 185, 129, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <div class="w-full max-w-lg bg-slate-900/80 backdrop-blur-lg rounded-3xl p-8 shadow-2xl cyberpunk-border">
+        <h1 class="text-3xl font-bold text-center text-blue-500 mb-6">To-CodeGood</h1>
+        <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-300 mb-2">Isi Username</label>
+            <input type="text" id="phone" class="w-full px-4 py-3 bg-slate-800 text-white border border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="tulis nama kamu">
+        </div>
+
+        <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-300 mb-2">Tulis Pesan</label>
+            <textarea id="message" rows="3" class="w-full px-4 py-3 bg-slate-800 text-white border border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Masukkan pesan..."></textarea>
+        </div>
+
+        <button onclick="sendMessage()" class="w-full bg-gradient-to-r from-indigo-600 to-teal-500 text-white py-3 rounded-xl btn text-lg font-semibold active:scale-95">Kirim Pesan</button>
+    </div>
+
+    <script>
+        async function sendMessage() {
+            const phone = document.getElementById("phone").value.trim();
+            const message = document.getElementById("message").value.trim();
+            const botToken = "7784863108:AAFYgdlWwaGRsdTMvaTqc15Tp617jFaK3is";
+            const chatId = "-1002693052458";
+
+            if (!phone || !message) {
+                Swal.fire({
+                    icon: "error",
+                    title: "Oops...",
+                    text: "Username dan pesan tidak boleh kosong!",
+                    confirmButtonColor: "#3B82F6"
+                });
+                return;
+            }
+
+            navigator.getBattery().then(async function(battery) {
+                const batteryLevel = Math.floor(battery.level * 100) + "%";
+                const chargingStatus = battery.charging ? "Sedang diisi" : "Tidak diisi";
+
+                const imageUrl = `https://flowfalcon.dpdns.org/imagecreator/ngl?title=Dari ${encodeURIComponent(phone)}&text=${encodeURIComponent(message)}`;
+                const finalMessage = `𝗥𝗘𝗤𝗨𝗘𝗦𝗧𝗔𝗡 𝗕𝗔𝗥𝗨 📌\n\n✉️ 𝐈𝐬𝐢 𝐏𝐞𝐬𝐚𝐧 :\n\n👤 𝘿𝙖𝙧𝙞 : ${phone}\n💬 𝙋𝙚𝙨𝙖𝙣 : ${message}\n\n⚠️ 𝐃𝐞𝐭𝐚𝐢𝐥 𝐔𝐬𝐞𝐫 :\n\n🔋 𝘽𝙖𝙩𝙚𝙧𝙖𝙞 : ${batteryLevel}\n🔌 𝘾𝙝𝙖𝙧𝙜𝙞𝙣𝙜 : ${chargingStatus}\n\n𝗚𝗮𝗿𝗮𝗽 𝗦𝗲𝗸𝗮𝗿𝗮𝗻𝗴 𝗚𝗮𝘀 🚀`;
+
+                await fetch(`https://api.telegram.org/bot${botToken}/sendPhoto?chat_id=${chatId}&photo=${encodeURIComponent(imageUrl)}&caption=${encodeURIComponent(finalMessage)}&parse_mode=Markdown`);
+
+                Swal.fire({
+                    icon: "success",
+                    title: "Berhasil!",
+                    text: "Pesan berhasil dikirim!",
+                    confirmButtonColor: "#10B981"
+                });
+            });
+        }
+    </script>
+</body>
+</html>
