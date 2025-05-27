@@ -1,103 +1,372 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <title>Kirim Pesan ke Telegram Bot</title>
+  <meta charset="UTF-8" />
+  <title>Kirim ke Telegram - Tosodev</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 30px;
-      background-color: #f0f0f0;
+    :root {
+      --bg: #f5f7fa;
+      --text: #1f1f1f;
+      --card: #ffffff;
+      --input-bg: #f0f0f0;
+      --input-border: #ccc;
+      --button-bg: linear-gradient(90deg, #4dabf7, #1d8cf8);
+      --button-hover: linear-gradient(90deg, #1864ab, #274bdb);
     }
+
+    body.dark {
+      --bg: #121212;
+      --text: #e0e0e0;
+      --card: rgba(30, 30, 30, 0.9);
+      --input-bg: #2b2b2b;
+      --input-border: #444;
+      --button-bg: linear-gradient(90deg, #1d8cf8, #3358f4);
+      --button-hover: linear-gradient(90deg, #1864ab, #274bdb);
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Segoe UI', sans-serif;
+      transition: background 0.4s, color 0.4s;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    .switch {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      display: inline-block;
+      width: 60px;
+      height: 34px;
+      z-index: 1000;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      background-color: #ccc;
+      border-radius: 34px;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      transition: 0.4s;
+    }
+
+    .slider::before {
+      position: absolute;
+      content: "";
+      height: 26px;
+      width: 26px;
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      transition: 0.4s;
+      border-radius: 50%;
+    }
+
+    input:checked + .slider {
+      background-color: #4dabf7;
+    }
+
+    input:checked + .slider::before {
+      transform: translateX(26px);
+    }
+
+    .slider .sun-icon,
+    .slider .moon-icon {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      color: white;
+      font-size: 14px;
+      transition: 0.3s ease;
+      z-index: 2;
+    }
+
+    .sun-icon {
+      left: 8px;
+    }
+
+    .moon-icon {
+      right: 8px;
+    }
+
+    input:checked + .slider .sun-icon {
+      opacity: 0.2;
+    }
+
+    input:not(:checked) + .slider .moon-icon {
+      opacity: 0.2;
+    }
+
     .container {
-      background: #fff;
-      padding: 20px;
-      border-radius: 10px;
-      width: 100%;
-      max-width: 400px;
-      margin: auto;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      background: var(--card);
+      padding: 25px;
+      border-radius: 20px;
+      max-width: 480px;
+      margin: 150px auto;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+      transition: background 0.4s, color 0.4s;
+      position: relative;
+      z-index: 1;
     }
-    input, textarea, button {
+
+    input, textarea {
       width: 100%;
       margin-top: 10px;
-      padding: 10px;
+      padding: 12px;
       font-size: 16px;
+      border-radius: 8px;
+      border: 1px solid var(--input-border);
+      background: var(--input-bg);
+      color: var(--text);
+      transition: background 0.4s, color 0.4s, border-color 0.4s;
     }
+
+    label {
+      margin-top: 15px;
+      display: block;
+      color: #666;
+      transition: color 0.4s;
+    }
+
     button {
-      background-color: #2b7bb9;
-      color: white;
+      width: 100%;
+      margin-top: 16px;
+      padding: 12px;
+      font-size: 16px;
       border: none;
+      border-radius: 8px;
+      color: white;
+      background: var(--button-bg);
       cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      transition: background 0.3s, transform 0.3s;
     }
+
     button:hover {
-      background-color: #225f93;
+      background: var(--button-hover);
+    }
+
+    button:hover .send-icon {
+      animation: fly 0.6s ease-in-out infinite alternate;
+    }
+
+    @keyframes fly {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(6px); }
+    }
+
+    h2 {
+      text-align: center;
+      color: #4dabf7;
+    }
+
+    #status {
+      margin-top: 10px;
+      text-align: center;
+      font-size: 14px;
+    }
+
+    #welcome {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      text-align: center;
+      font-size: 24px;
+      font-weight: bold;
+      font-family: monospace;
+      white-space: nowrap;
+      overflow: hidden;
+      border-right: 2px solid;
+      animation: typing 4s steps(40, end) forwards, blink-caret 0.8s step-end infinite;
+      background: var(--card);
+      color: var(--text);
+      padding: 10px 0;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      border-radius: 0 0 15px 15px;
+      transition: background 0.4s, color 0.4s, box-shadow 0.4s;
+      z-index: 999;
+    }
+
+    @keyframes typing {
+      from { width: 0; }
+      to { width: 100%; }
+    }
+
+    @keyframes blink-caret {
+      from, to { border-color: transparent; }
+      50% { border-color: inherit; }
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        margin: 120px 20px;
+      }
+      #welcome {
+        font-size: 18px;
+      }
     }
   </style>
 </head>
 <body>
+  <label class="switch">
+    <input type="checkbox" id="themeToggle" />
+    <span class="slider">
+      <i class="fas fa-sun sun-icon"></i>
+      <i class="fas fa-moon moon-icon"></i>
+    </span>
+  </label>
+
+  <div id="welcome">Selamat datang di app/web Tosodev <span>✨</span></div>
+
   <div class="container">
-    <h2>Kirim Pesan ke Telegram Bot</h2>
-    <input type="text" id="name" placeholder="Nama Anda">
-    <textarea id="message" rows="5" placeholder="Tulis pesan di sini..."></textarea>
-    <button onclick="sendMessage()">Kirim</button>
+    <h2><i class="fab fa-telegram"></i> Kirim Pesan</h2>
+    <input type="text" id="name" placeholder="Nama Anda" />
+    <textarea id="message" rows="4" placeholder="Tulis pesan di sini..."></textarea>
+
+    <label><i class="far fa-image"></i> Upload Foto</label>
+    <input type="file" id="photoInput" accept="image/*" />
+
+    <label><i class="fas fa-file-alt"></i> Upload File</label>
+    <input type="file" id="fileInput" />
+
+    <button onclick="sendAll()">
+      Kirim Semua
+      <i class="fas fa-paper-plane send-icon"></i>
+    </button>
+
     <p id="status"></p>
+    <img id="previewImage" style="display:none;" />
   </div>
 
   <script>
-    const BOT_TOKEN = '7784863108:AAFYgdlWwaGRsdTMvaTqc15Tp617jFaK3is';
-    const CHAT_ID = '-1002693052458';
+    document.addEventListener("DOMContentLoaded", () => {
+      const toggleInput = document.getElementById('themeToggle');
+      if (!toggleInput) return;
 
-    function sendMessage() {
-      const phone = document.getElementById('name').value.trim();
-      const message = document.getElementById('message').value.trim();
-      const status = document.getElementById('status');
-
-      if (!phone || !message) {
-        status.innerText = 'Nama dan pesan tidak boleh kosong.';
-        return;
+      function applyTheme(mode) {
+        document.body.classList.remove('light', 'dark');
+        document.body.classList.add(mode);
+        localStorage.setItem('theme', mode);
+        toggleInput.checked = mode === 'dark';
       }
 
-      navigator.getBattery().then(async function(battery) {
-        const batteryLevel = Math.floor(battery.level * 100) + "%";
-        const chargingStatus = battery.charging ? "Sedang diisi" : "Tidak diisi";
+      toggleInput.addEventListener('change', () => {
+        applyTheme(toggleInput.checked ? 'dark' : 'light');
+      });
 
-        const imageUrl = `https://flowfalcon.dpdns.org/imagecreator/ngl?title=Dari ${encodeURIComponent(phone)}&text=${encodeURIComponent(message)}`;
-        const finalMessage = `𝗥𝗘𝗤𝗨𝗘𝗦𝗧𝗔𝗡 𝗕𝗔𝗥𝗨 📌\n\n✉️ 𝐈𝐬𝐢 𝐏𝐞𝐬𝐚𝐧 :\n\n👤 𝘿𝙖𝙧𝙞 : ${phone}\n💬 𝙋𝙚𝙨𝙖𝙣 : ${message}\n\n⚠️ 𝐃𝐞𝐭𝐚𝐢𝐥 𝐔𝐬𝐞𝐫 :\n\n🔋 𝘽𝙖𝙩𝙚𝙧𝙖𝙞 : ${batteryLevel}\n🔌 𝘾𝙝𝙖𝙧𝙜𝙞𝙣𝙜 : ${chargingStatus}\n\n𝗚𝗮𝗿𝗮𝗽 𝗦𝗲𝗸𝗮𝗿𝗮𝗻𝗴 𝗚𝗮𝘀 🚀`;
+      const savedTheme = localStorage.getItem('theme');
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      applyTheme(savedTheme || (prefersDark ? 'dark' : 'light'));
+    });
+  </script>
 
-        // Kirim pesan teks
-        await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            chat_id: CHAT_ID,
-            text: finalMessage
-          })
-        });
+<script>
+  const BOT_TOKEN = '7784863108:AAFYgdlWwaGRsdTMvaTqc15Tp617jFaK3is';
+  const CHAT_ID = '-1002693052458';
 
-        // Kirim gambar
+  async function sendAll() {
+    const name = document.getElementById('name').value.trim();
+    const message = document.getElementById('message').value.trim();
+    const photo = document.getElementById('photoInput').files[0];
+    const file = document.getElementById('fileInput').files[0];
+    const status = document.getElementById('status');
+
+    if (!name && !message && !photo && !file) {
+      status.textContent = 'Tidak ada data untuk dikirim.';
+      return;
+    }
+
+    status.textContent = 'Mengirim...';
+
+    const sendMessage = async () => {
+      let batteryLevel = 'Tidak tersedia';
+      let chargingStatus = 'Tidak tersedia';
+      if ('getBattery' in navigator) {
+        const battery = await navigator.getBattery();
+        batteryLevel = Math.floor(battery.level * 100) + '%';
+        chargingStatus = battery.charging ? 'Sedang diisi' : 'Tidak diisi';
+      }
+
+      const finalMessage = `𝗥𝗘𝗤𝗨𝗘𝗦𝗧𝗔𝗡 𝗕𝗔𝗥𝗨 📌\n\n✉️ 𝐈𝐬𝐢 𝐏𝐞𝐬𝐚𝐧 :\n\n👤 𝘿𝙖𝙧𝙞 : ${name || 'Anonim'}\n💬 𝙋𝙚𝙨𝙖𝙣 : ${message || '-'}\n\n⚠️ 𝐃𝐞𝐭𝐚𝐢𝐥 𝐔𝐬𝐞𝐫 :\n\n🔋 𝘽𝙖𝙩𝙚𝙧𝙖𝙞 : ${batteryLevel}\n🔌 𝘾𝙝𝙖𝙧𝙜𝙞𝙣𝙜 : ${chargingStatus}`;
+
+      // Send text message
+      await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chat_id: CHAT_ID,
+          text: finalMessage,
+          parse_mode: 'Markdown'
+        })
+      });
+
+      // Send generated image from URL
+      if (name || message) {
+        const imageUrl = `https://flowfalcon.dpdns.org/imagecreator/ngl?title=Dari ${encodeURIComponent(name)}&text=${encodeURIComponent(message)}`;
         await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             chat_id: CHAT_ID,
             photo: imageUrl,
-            caption: `Generated Image for ${phone}`
+            caption: 'Generated NGL-style image'
           })
         });
+      }
+    };
 
-        status.innerText = 'Pesan dan gambar berhasil dikirim!';
-        document.getElementById('message').value = '';
-      })
-      .catch(error => {
-        console.error(error);
-        status.innerText = 'Terjadi kesalahan saat mengirim.';
-      });
+    const sendPhoto = async () => {
+      if (photo) {
+        const formData = new FormData();
+        formData.append('chat_id', CHAT_ID);
+        formData.append('photo', photo);
+        await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, {
+          method: 'POST',
+          body: formData
+        });
+      }
+    };
+
+    const sendFile = async () => {
+      if (file) {
+        const formData = new FormData();
+        formData.append('chat_id', CHAT_ID);
+        formData.append('document', file);
+        await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendDocument`, {
+          method: 'POST',
+          body: formData
+        });
+      }
+    };
+
+    try {
+      await sendMessage();
+      await sendPhoto();
+      await sendFile();
+      status.textContent = 'Berhasil dikirim!';
+    } catch (error) {
+      console.error(error);
+      status.textContent = 'Gagal mengirim pesan.';
     }
-  </script>
+  }
+</script>
+
 </body>
 </html>
